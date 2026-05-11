@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Apply Now - Hot Beans Web</title>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .form-group .error {
+    display: none;
+    color: #b00020;
+    font-size: 13px;
+    margin-top: 6px;
+  }
+  .form-group.invalid input,
+  .form-group.invalid select,
+  .form-group.invalid textarea {
+    border-color: #b00020;
+    background: #fff5f5;
+  }
+  .form-group.invalid .error { display: block; }
+  .form-group .hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .form-success {
+    background: #ecfdf5;
+    border: 1px solid #10b981;
+    color: #065f46;
+    padding: 14px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .file-input {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: 1px dashed var(--border);
+    border-radius: 4px;
+    background: #fafafa;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .file-selected {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #f5f7fa;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  .file-selected.show { display: flex; }
+  .file-selected .file-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .file-remove {
+    background: none;
+    border: none;
+    color: #b00020;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 8px;
+  }
+  .file-remove:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="index.html" class="logo"><img src="images/logo.png" alt="Hot Beans Web logo" /></a>
+  <nav class="site-nav">
+    <a href="index.html">Homepage</a>
+    <a href="apply.html">Apply Now</a>
+    <a href="trainees.html">Meet our Trainee Developers</a>
+    <a href="courses.html">Courses</a>
+    <a href="jobs.html">Job Specification</a>
+  </nav>
+</header>
+
+<section>
+  <div class="form-wrap">
+    <h1>Apply Now</h1>
+
+    <div id="formSuccess" class="form-success">
+      Thanks! Your application has been submitted. We'll be in touch soon.
+    </div>
+
+    <form id="applyForm" novalidate enctype="multipart/form-data">
+      <div class="form-group" data-field="firstName">
+        <label for="firstName">First Name</label>
+        <input type="text" id="firstName" name="firstName" maxlength="50" />
+        <div class="error">Please enter your first name (letters only, 2–50 characters).</div>
+      </div>
+
+      <div class="form-group" data-field="lastName">
+        <label for="lastName">Last Name</label>
+        <input type="text" id="lastName" name="lastName" maxlength="50" />
+        <div class="error">Please enter your last name (letters only, 2–50 characters).</div>
+      </div>
+
+      <div class="form-group" data-field="address">
+        <label for="address">Address</label>
+        <input type="text" id="address" name="address" maxlength="120" />
+        <div class="error">Please enter your address (5–120 characters).</div>
+      </div>
+
+      <div class="form-group" data-field="postcode">
+        <label for="postcode">Postcode</label>
+        <input type="text" id="postcode" name="postcode" maxlength="10" />
+        <div class="hint">UK format, e.g. M1 2AB</div>
+        <div class="error">Please enter a valid UK postcode (e.g. M1 2AB).</div>
+      </div>
+
+      <div class="form-group" data-field="email">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" maxlength="100" />
+        <div class="error">Please enter a valid email address (e.g. you@example.com).</div>
+      </div>
+
+      <div class="form-group" data-field="phone">
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" name="phone" maxlength="20" />
+        <div class="hint">UK number with 10–11 digits, e.g. 07123 456789</div>
+        <div class="error">Please enter a valid UK phone number.</div>
+      </div>
+
+      <div class="form-group" data-field="position">
+        <label for="position">Job Position</label>
+        <select id="position" name="position">
+          <option value="">Select a position…</option>
+          <option>Junior Front-End Developer</option>
+          <option>Junior Back-End Developer</option>
+          <option>Junior Full-Stack Developer</option>
+          <option>Trainee Web Developer</option>
+        </select>
+        <div class="error">Please choose the role you're applying for.</div>
+      </div>
+
+      <div class="form-group" data-field="cv">
+        <label for="cv">Upload your CV</label>
+        <input type="file" id="cv" name="cv" class="file-input" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+        <div id="cvSelected" class="file-selected" aria-live="polite">
+          <span class="file-name" id="cvFileName"></span>
+          <button type="button" id="cvRemove" class="file-remove" aria-label="Remove uploaded CV">Remove</button>
+        </div>
+        <div class="hint">PDF, DOC or DOCX, max 5 MB.</div>
+        <div class="error">Please upload your CV as a PDF, DOC or DOCX file (max 5 MB).</div>
+      </div>
+
+      <div class="form-group" data-field="message">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" maxlength="1000" placeholder="Tell us why you'd like to work at Hot Beans Web…"></textarea>
+        <div class="hint">Up to 1000 characters.</div>
+        <div class="error">Please write a short message (10–1000 characters).</div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn">Submit Application</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-top">
+    <div>Email: hotbeanswebcareers@gmail.com</div>
+    <div>Phone: +44 7781 486399</div>
+  </div>
+  <div class="socials">
+    <a href="#">Facebook</a>
+    <a href="#">Instagram</a>
+    <a href="#">LinkedIn</a>
+    <a href="#">Twitter</a>
+  </div>
+</footer>
+
+<script>
+(function () {
+  const form = document.getElementById('applyForm');
+  const success = document.getElementById('formSuccess');
+
+  const nameRe = /^[A-Za-z][A-Za-z'\- ]{1,49}$/;
+  const ukPostcodeRe = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i;
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const ukPhoneRe = /^(?:(?:\+44\s?|0)(?:\d\s?){9,10})$/;
+
+  const allowedCvTypes = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ];
+  const allowedCvExt = ['pdf', 'doc', 'docx'];
+  const maxCvBytes = 5 * 1024 * 1024;
+
+  const validators = {
+    firstName: v => nameRe.test(v.trim()),
+    lastName: v => nameRe.test(v.trim()),
+    address: v => v.trim().length >= 5 && v.trim().length <= 120,
+    postcode: v => ukPostcodeRe.test(v.trim()),
+    email: v => emailRe.test(v.trim()) && v.trim().length <= 100,
+    phone: v => ukPhoneRe.test(v.trim().replace(/\s+/g, ' ')),
+    position: v => v.trim() !== '',
+    message: v => v.trim().length >= 10 && v.trim().length <= 1000,
+    cv: file => {
+      if (!file) return false;
+      if (file.size > maxCvBytes) return false;
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      return allowedCvExt.includes(ext) && (allowedCvTypes.includes(file.type) || file.type === '');
+    }
+  };
+
+  function fieldValue(name) {
+    const el = form.elements[name];
+    if (el && el.type === 'file') return el.files[0] || null;
+    return el ? el.value : '';
+  }
+
+  function setValid(name, ok) {
+    const group = form.querySelector('[data-field="' + name + '"]');
+    if (!group) return;
+    group.classList.toggle('invalid', !ok);
+  }
+
+  function validateField(name) {
+    const ok = validators[name](fieldValue(name));
+    setValid(name, ok);
+    return ok;
+  }
+
+  Object.keys(validators).forEach(name => {
+    const el = form.elements[name];
+    if (!el) return;
+    const evt = el.tagName === 'SELECT' || el.type === 'file' ? 'change' : 'blur';
+    el.addEventListener(evt, () => validateField(name));
+    el.addEventListener('input', () => {
+      const group = form.querySelector('[data-field="' + name + '"]');
+      if (group && group.classList.contains('invalid')) validateField(name);
+    });
+  });
+
+  const cvInput = document.getElementById('cv');
+  const cvSelected = document.getElementById('cvSelected');
+  const cvFileName = document.getElementById('cvFileName');
+  const cvRemove = document.getElementById('cvRemove');
+
+  function updateCvDisplay() {
+    const file = cvInput.files[0];
+    if (file) {
+      cvFileName.textContent = file.name;
+      cvSelected.classList.add('show');
+    } else {
+      cvFileName.textContent = '';
+      cvSelected.classList.remove('show');
+    }
+  }
+  cvInput.addEventListener('change', updateCvDisplay);
+  cvRemove.addEventListener('click', () => {
+    cvInput.value = '';
+    updateCvDisplay();
+    validateField('cv');
+    cvInput.focus();
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    success.style.display = 'none';
+    let allOk = true;
+    let firstInvalid = null;
+    Object.keys(validators).forEach(name => {
+      const ok = validateField(name);
+      if (!ok && !firstInvalid) firstInvalid = form.elements[name];
+      if (!ok) allOk = false;
+    });
+    if (!allOk) {
+      if (firstInvalid && typeof firstInvalid.focus === 'function') firstInvalid.focus();
+      return;
+    }
+    success.style.display = 'block';
+    form.reset();
+    updateCvDisplay();
+    Object.keys(validators).forEach(n => setValid(n, true));
+    success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+})();
+</script>
+</body>
+</html>
