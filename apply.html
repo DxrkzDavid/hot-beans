@@ -1,4 +1,4 @@
-<!DOC<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -9,8 +9,30 @@
   .form-group .error {
     display: none;
     color: #b00020;
-    font-size: 13px;
-    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 8px;
+    padding: 8px 10px 8px 32px;
+    background: #fff5f5;
+    border-left: 3px solid #b00020;
+    border-radius: 4px;
+    position: relative;
+  }
+  .form-group .error::before {
+    content: "!";
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    text-align: center;
+    background: #b00020;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
   }
   .form-group.invalid input,
   .form-group.invalid select,
@@ -20,7 +42,7 @@
   }
   .form-group.invalid .error { display: block; }
   .form-group .hint {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--muted);
     margin-top: 4px;
   }
@@ -33,6 +55,23 @@
     margin-bottom: 20px;
     display: none;
   }
+  .form-error-summary {
+    display: none;
+    background: #fff5f5;
+    border: 1px solid #b00020;
+    color: #7a0014;
+    padding: 14px 16px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
+  .form-error-summary.show { display: block; }
+  .form-error-summary h2 {
+    font-size: 16px;
+    margin: 0 0 8px;
+    color: #b00020;
+  }
+  .form-error-summary ul { margin: 0; padding-left: 20px; font-size: 14px; }
+  .form-error-summary a { color: #7a0014; font-weight: 600; }
   .file-input {
     display: block;
     width: 100%;
@@ -91,6 +130,11 @@
 
     <div id="formSuccess" class="form-success">
       Thanks! Your application has been submitted. We'll be in touch soon.
+    </div>
+
+    <div id="formErrorSummary" class="form-error-summary" role="alert" aria-live="assertive">
+      <h2>Please fix the following before submitting:</h2>
+      <ul id="formErrorList"></ul>
     </div>
 
     <form id="applyForm" novalidate enctype="multipart/form-data">
@@ -186,6 +230,8 @@
 (function () {
   const form = document.getElementById('applyForm');
   const success = document.getElementById('formSuccess');
+  const summary = document.getElementById('formErrorSummary');
+  const summaryList = document.getElementById('formErrorList');
 
   const nameRe = /^[A-Za-z][A-Za-z'\- ]{1,49}$/;
   const ukPostcodeRe = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i;
@@ -200,20 +246,78 @@
   const allowedCvExt = ['pdf', 'doc', 'docx'];
   const maxCvBytes = 5 * 1024 * 1024;
 
+  const labels = {
+    firstName: 'First name',
+    lastName: 'Last name',
+    address: 'Address',
+    postcode: 'Postcode',
+    email: 'Email',
+    phone: 'Phone number',
+    position: 'Job position',
+    cv: 'CV upload',
+    message: 'Message'
+  };
+
+  // Each validator returns true if valid, otherwise a clear error message.
   const validators = {
-    firstName: v => nameRe.test(v.trim()),
-    lastName: v => nameRe.test(v.trim()),
-    address: v => v.trim().length >= 5 && v.trim().length <= 120,
-    postcode: v => ukPostcodeRe.test(v.trim()),
-    email: v => emailRe.test(v.trim()) && v.trim().length <= 100,
-    phone: v => ukPhoneRe.test(v.trim().replace(/\s+/g, ' ')),
-    position: v => v.trim() !== '',
-    message: v => v.trim().length >= 10 && v.trim().length <= 1000,
+    firstName: v => {
+      const t = v.trim();
+      if (!t) return 'Please enter your first name.';
+      if (t.length < 2) return 'Your first name must be at least 2 characters.';
+      if (!nameRe.test(t)) return 'Your first name can only contain letters, spaces, hyphens and apostrophes.';
+      return true;
+    },
+    lastName: v => {
+      const t = v.trim();
+      if (!t) return 'Please enter your last name.';
+      if (t.length < 2) return 'Your last name must be at least 2 characters.';
+      if (!nameRe.test(t)) return 'Your last name can only contain letters, spaces, hyphens and apostrophes.';
+      return true;
+    },
+    address: v => {
+      const t = v.trim();
+      if (!t) return 'Please enter your address.';
+      if (t.length < 5) return 'Your address looks too short — please enter at least 5 characters.';
+      if (t.length > 120) return 'Your address is too long — please keep it under 120 characters.';
+      return true;
+    },
+    postcode: v => {
+      const t = v.trim();
+      if (!t) return 'Please enter your postcode.';
+      if (!ukPostcodeRe.test(t)) return 'That doesn\u2019t look like a valid UK postcode. Try the format M1 2AB.';
+      return true;
+    },
+    email: v => {
+      const t = v.trim();
+      if (!t) return 'Please enter your email address.';
+      if (t.length > 100) return 'Your email address is too long (max 100 characters).';
+      if (!emailRe.test(t)) return 'Please enter a valid email, for example you@example.com.';
+      return true;
+    },
+    phone: v => {
+      const t = v.trim();
+      if (!t) return 'Please enter your phone number.';
+      if (!ukPhoneRe.test(t.replace(/\s+/g, ' '))) return 'Please enter a valid UK phone number, for example 07123 456789 or +44 7123 456789.';
+      return true;
+    },
+    position: v => {
+      if (!v.trim()) return 'Please choose the role you\u2019re applying for.';
+      return true;
+    },
+    message: v => {
+      const t = v.trim();
+      if (!t) return 'Please write a short message telling us why you\u2019d like to work here.';
+      if (t.length < 10) return 'Your message is too short — please write at least 10 characters.';
+      if (t.length > 1000) return 'Your message is too long — please keep it under 1000 characters.';
+      return true;
+    },
     cv: file => {
-      if (!file) return false;
-      if (file.size > maxCvBytes) return false;
+      if (!file) return 'Please upload your CV.';
+      if (file.size > maxCvBytes) return 'Your CV file is too large — please upload a file under 5 MB.';
       const ext = (file.name.split('.').pop() || '').toLowerCase();
-      return allowedCvExt.includes(ext) && (allowedCvTypes.includes(file.type) || file.type === '');
+      if (!allowedCvExt.includes(ext)) return 'Your CV must be a PDF, DOC or DOCX file.';
+      if (file.type && !allowedCvTypes.includes(file.type)) return 'Your CV file type isn\u2019t supported. Please upload a PDF, DOC or DOCX.';
+      return true;
     }
   };
 
@@ -223,16 +327,26 @@
     return el ? el.value : '';
   }
 
-  function setValid(name, ok) {
+  function setError(name, message) {
     const group = form.querySelector('[data-field="' + name + '"]');
     if (!group) return;
-    group.classList.toggle('invalid', !ok);
+    const errEl = group.querySelector('.error');
+    if (message === true) {
+      group.classList.remove('invalid');
+      const input = group.querySelector('input,select,textarea');
+      if (input) input.removeAttribute('aria-invalid');
+    } else {
+      group.classList.add('invalid');
+      if (errEl) errEl.textContent = message;
+      const input = group.querySelector('input,select,textarea');
+      if (input) input.setAttribute('aria-invalid', 'true');
+    }
   }
 
   function validateField(name) {
-    const ok = validators[name](fieldValue(name));
-    setValid(name, ok);
-    return ok;
+    const result = validators[name](fieldValue(name));
+    setError(name, result);
+    return result === true ? true : result;
   }
 
   Object.keys(validators).forEach(name => {
@@ -272,21 +386,38 @@
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     success.style.display = 'none';
-    let allOk = true;
-    let firstInvalid = null;
+    summary.classList.remove('show');
+    summaryList.innerHTML = '';
+
+    const errors = [];
     Object.keys(validators).forEach(name => {
-      const ok = validateField(name);
-      if (!ok && !firstInvalid) firstInvalid = form.elements[name];
-      if (!ok) allOk = false;
+      const result = validateField(name);
+      if (result !== true) errors.push({ name, message: result });
     });
-    if (!allOk) {
-      if (firstInvalid && typeof firstInvalid.focus === 'function') firstInvalid.focus();
+
+    if (errors.length) {
+      errors.forEach(({ name, message }) => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = '#' + name;
+        a.textContent = labels[name] + ': ' + message;
+        a.addEventListener('click', ev => {
+          ev.preventDefault();
+          const el = form.elements[name];
+          if (el && typeof el.focus === 'function') el.focus();
+        });
+        li.appendChild(a);
+        summaryList.appendChild(li);
+      });
+      summary.classList.add('show');
+      summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
+
     success.style.display = 'block';
     form.reset();
     updateCvDisplay();
-    Object.keys(validators).forEach(n => setValid(n, true));
+    Object.keys(validators).forEach(n => setError(n, true));
     success.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 })();
