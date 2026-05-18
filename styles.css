@@ -17,7 +17,8 @@ body {
   font-family: 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
   color: var(--dark);
   background: var(--bg);
-  line-height: 1.6;
+  font-size: 17px;
+  line-height: 1.75;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -40,8 +41,9 @@ body {
   margin-left: 22px;
   color: var(--dark);
   text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 .site-nav a:hover { color: var(--blue); }
 
@@ -127,7 +129,7 @@ section h2 {
   gap: 20px;
   margin-bottom: 30px;
 }
-.footer-top div { font-size: 14px; }
+.footer-top div { font-size: 16px; }
 .socials {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -154,7 +156,7 @@ section h2 {
 .form-group { margin-bottom: 18px; }
 .form-group label {
   display: block;
-  font-size: 14px;
+  font-size: 16px;
   margin-bottom: 6px;
   color: var(--muted);
 }
@@ -165,7 +167,7 @@ section h2 {
   padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 16px;
   font-family: inherit;
 }
 .form-group textarea { min-height: 140px; resize: vertical; }
@@ -206,7 +208,7 @@ section h2 {
   display: block;
 }
 .profile-card h3 { font-size: 16px; margin-bottom: 6px; }
-.profile-card p { font-size: 13px; color: var(--muted); }
+.profile-card p { font-size: 15px; color: var(--muted); }
 
 /* Courses */
 .courses-grid {
@@ -234,7 +236,7 @@ section h2 {
   font-size: 12px;
 }
 .course-card h3 { font-size: 16px; margin-bottom: 8px; }
-.course-card p { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+.course-card p { font-size: 15px; color: var(--muted); margin-bottom: 12px; }
 
 /* Jobs */
 .jobs-grid {
@@ -259,17 +261,17 @@ section h2 {
   background: var(--soft);
   padding: 12px;
   border-radius: 4px;
-  font-size: 13px;
+  font-size: 15px;
   margin-bottom: 14px;
 }
 .job-meta div { margin-bottom: 4px; }
 .job-card h4 {
-  font-size: 14px;
+  font-size: 16px;
   margin-top: 12px;
   margin-bottom: 6px;
 }
 .job-card p, .job-card ul {
-  font-size: 13px;
+  font-size: 15px;
   color: var(--muted);
 }
 .job-card ul { padding-left: 20px; }
@@ -284,5 +286,5 @@ section h2 {
   .site-footer { padding: 30px 20px; }
   .footer-top { flex-direction: column; align-items: center; text-align: center; gap: 10px; }
   .socials { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .socials a { padding: 14px; font-size: 14px; }
+  .socials a { padding: 14px; font-size: 16px; }
 }
